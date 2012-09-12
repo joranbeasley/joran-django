@@ -91,6 +91,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
+#    'feincms',
+#    'feincms.module.page',
+#    'feincms.module.medialibrary',
+#    'feincms.*',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

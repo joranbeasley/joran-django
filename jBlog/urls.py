@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext_lazy as _
 from django.conf.urls.defaults import *
 from django.conf import settings
 # Uncomment the next two lines to enable the admin:
