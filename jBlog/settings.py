@@ -1,5 +1,5 @@
 # Django settings for jBlog project.
-
+RUN_LOCAL = True
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -11,7 +11,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.'+('mysql' if not RUN_LOCAL else 'sqlite3'), # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'django_main',                      # Or path to database file if using sqlite3.
         'USER': 'dbjoran',                      # Not used with sqlite3.
         'PASSWORD': 's4ww1E4Gg',                  # Not used with sqlite3.
@@ -46,7 +46,8 @@ USE_L10N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = '/home/django_user42/adventuresinpy.com/joran-django/media'
-
+if RUN_LOCAL:
+    MEDIA_ROOT =r"C:\Users\Joran\Documents\joran-django\media"
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
@@ -81,7 +82,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/django_user42/adventuresinpy.com/joran-django/templates',
+    '/home/django_user42/adventuresinpy.com/joran-django/templates' if not RUN_LOCAL else r"C:\Users\Joran\Documents\joran-django\templates" ,
 )
 
 INSTALLED_APPS = (
