@@ -1,5 +1,5 @@
 # Django settings for jBlog project.
-RUN_LOCAL = True
+RUN_LOCAL = False
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 

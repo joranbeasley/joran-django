@@ -1,5 +1,6 @@
 {% include "base/header.html" %}
 {% for entry in entries %}
-{{entry.stub|safe}}
+<div>{{ entry.title }}</div>
+<div>{{ entry.body|safe }}</div>
 {% endfor %}
 {% include "base/footer.html" %}

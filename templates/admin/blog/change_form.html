@@ -1,0 +1,12 @@
+{% extends "admin/change_form.html" %}
+{% block extrahead %}{{ block.super }}
+
+<script type="text/javascript">
+django.jQuery(".kindeditor").ready(function() {
+    console.log(django.jQuery(".kindeditor"));
+    d = KindEditor.create('textarea[class="kindeditor"]',{
+            langType : 'en'
+        });
+})
+</script>
+{% endblock extrahead %}
