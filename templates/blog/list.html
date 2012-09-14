@@ -1,6 +1,8 @@
 {% include "base/header.html" %}
+{% load truncatehtml %}
 {% for entry in entries %}
-<div>{{ entry.title }}</div>
-<div>{{ entry.body|safe }}</div>
+<hr>
+<div><a href="">{{ entry.title }}</a></div>
+<div>{{ entry.body|safe|truncatehtml:100 }}</div>
 {% endfor %}
 {% include "base/footer.html" %}
