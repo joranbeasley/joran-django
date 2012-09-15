@@ -1,8 +1,9 @@
-{% include "base/header.html" %}
+{% extends "base/main.html" %}
 {% load truncatehtml %}
+{% block content %}
 {% for entry in entries %}
 <hr>
 <div><a href="">{{ entry.title }}</a></div>
-<div>{{ entry.body|safe|truncatehtml:100 }}</div>
+<div>{{ entry.body|safe|truncatehtml:200 }}</div>
 {% endfor %}
-{% include "base/footer.html" %}
+{% endblock %}

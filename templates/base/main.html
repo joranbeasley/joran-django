@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+{% block site_title %}
+    {% if title %}
+    <title>{{ title }}</title>
+    {% else %}
+    <title>Adventures in Py</title>
+    {% endif %}
+{% endblock %}
+    <link rel="stylesheet" type="text/css" href="/media/css/menu.css" />
+    <link rel="stylesheet" type="text/css" href="/media/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="/media/google-code-prettify/distrib/google-code-prettify/sunburst.css" />
+    <script type="text/javascript" src="/media/google-code-prettify/distrib/google-code-prettify/prettify.js"></script>
+    <script type="text/javascript" src="/media/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/media/js/jquery.init.js"></script>
+{% block extra_header %}
+
+{% endblock %}
+    <script type="text/javascript">
+        function LoadComplete(){
+            prettyPrint()
+            {% block pagereadyJS %}
+
+            {% endblock %}
+        }
+
+    </script>
+</head>
+<body onload="LoadComplete();">
+{% block site_header %}
+    <div style="display:block;background-image:url(/media/python_header1.gif);background-repeat:no-repeat;width:100%;height:200px;background-position:center;margin:0px;padding:0px;"></div>
+{% endblock %}
+{% block site_menu %}
+    {% include "base/menu.html" %}
+{% endblock %}
+<div id="main_content">
+{% block content %}
+    No Content Your template should override
+{% endblock %}
+</div>
+{% block site_footer %}
+{% endblock %}
+</body>
+</html>
+{% block posthtml %}
+    <div id="footer_wrap"><div id="footer">(c) Joran Beasley 2012<span style="float:right">Powered by Django</span></div></div>
+{% endblock %}

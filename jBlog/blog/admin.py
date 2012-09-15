@@ -4,9 +4,9 @@ from django import forms
 
 class KindEditor(forms.Textarea):
     class Media:
-       css ={'all':['editor/themes/default/default.css']}
+       css ={'all':['/media/kindeditor-4.1.2/themes/default/default.css']}
        
-       js = ( 'editor/kindeditor-min.js', 'editor/lang/en.js',)
+       js = ( '/media/kindeditor-4.1.2/kindeditor-min.js', '/media/kindeditor-4.1.2/lang/en.js',)
     def __init__(self):
        attrs = {}
        attrs['class'] = 'kindeditor'
