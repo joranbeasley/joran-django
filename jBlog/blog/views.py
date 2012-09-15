@@ -53,5 +53,11 @@ def search(request,path=''):
         return __no_qry()
     return render_to_response('blog/list.html', {'entries':result})
 
-def upload(requesst,path=''):
+def upload_image(requesst,path=''):
     return HttpResponse("Complete")
+
+def view(request,article_id=-1):
+    try:article = Entry.objects.get(pk=article_id)
+    except ValueError:
+        article = Entry.objects.get(title=article_id.replace("_"," "))
+    return render_to_response('blog/view.html',{'entry':article,'title':article.title})

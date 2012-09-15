@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.html import escape
 from django.contrib import admin
 import textwrap
 # Create your models here.
@@ -12,6 +13,8 @@ class Category(models.Model):
     title = models.CharField(max_length=200)
     def __unicode__(self):
          return "{0}".format(self.title)
+    def url(self):
+        return escape(self.title.replace(" ",'_'))
 
 class Entry(models.Model):
     body = models.TextField()
@@ -21,10 +24,5 @@ class Entry(models.Model):
     category = models.ForeignKey(Category)
     def __unicode__(self):
        return unicode(self.category)+":"+unicode(self.title)+" - "+str(self.publish_date)
-    def stub(self):
-       stb = '<div class="article">'
-       stb += '<div class="article_header">{0}</div>'.format(self.title)
-       stb += '<div class="article_main">{0}</div>'.format(textwrap.wrap(self.body,300)[0])
-       stb += "</div>"
-       return stb
-
+    def url(self):
+        return escape(self.title.replace(" ",'_'))

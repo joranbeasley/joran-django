@@ -1,8 +1,6 @@
 from django.conf.urls.defaults import patterns,include
 #admin.autodiscover()
-from views import index,search,upload
-
-asdasd="fck"
+from views import index,search,upload_image,view
 
 urlpatterns = patterns('',
     # Example:
@@ -11,7 +9,8 @@ urlpatterns = patterns('',
     # Uncomment the admin/doc line below to enable admin documentation:
     (r'^$',index,{}),
     (r'^search.php$',search),
-    (r'^upload.php$',upload),
+    (r'^upload.php$',upload_image),
+    (r'^view/(?P<article_id>.+)/?$',view),
     #(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     #(r'^admin/docz/', settings.MEDIA_ROOT),
     # Uncomment the next line to enable the admin:

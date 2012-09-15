@@ -3,7 +3,7 @@
 {% block content %}
 {% for entry in entries %}
 <hr>
-<div><a href="">{{ entry.title }}</a></div>
+<div><a href="/view/{{ entry.url }}">{{ entry.title }}</a></div>
 <div>{{ entry.body|safe|truncatehtml:200 }}</div>
 {% endfor %}
 {% endblock %}

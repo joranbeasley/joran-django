@@ -13,7 +13,8 @@
     <link rel="stylesheet" type="text/css" href="/media/google-code-prettify/distrib/google-code-prettify/sunburst.css" />
     <script type="text/javascript" src="/media/google-code-prettify/distrib/google-code-prettify/prettify.js"></script>
     <script type="text/javascript" src="/media/js/jquery.min.js"></script>
-    <script type="text/javascript" src="/media/js/jquery.init.js"></script>
+    <!--<script type="text/javascript" src="/media/js/jquery.init.js"></script>-->
+    <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 {% block extra_header %}
 
 {% endblock %}
@@ -23,6 +24,29 @@
             {% block pagereadyJS %}
 
             {% endblock %}
+            $("#search").val("Search...").addClass("empty");
+
+            // When you click on #search
+            $("#search").focus(function(){
+
+                // If the value is equal to "Search..."
+                if($(this).val() == "Search...") {
+                    // remove all the text and the class of .empty
+                    $(this).val("").removeClass("empty");;
+                }
+
+            });
+
+            // When the focus on #search is lost
+            $("#search").blur(function(){
+
+                // If the input field is empty
+                if($(this).val() == "") {
+                    // Add the text "Search..." and a class of .empty
+                    $(this).val("Search...").addClass("empty");
+                }
+
+            });
         }
 
     </script>
@@ -40,9 +64,10 @@
 {% endblock %}
 </div>
 {% block site_footer %}
+    <div id="footer_wrap"><div id="footer">(c) Joran Beasley 2012<span style="float:right">Powered by Django</span></div></div>
 {% endblock %}
 </body>
 </html>
 {% block posthtml %}
-    <div id="footer_wrap"><div id="footer">(c) Joran Beasley 2012<span style="float:right">Powered by Django</span></div></div>
+
 {% endblock %}
