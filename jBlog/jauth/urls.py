@@ -1,20 +1,19 @@
+__author__ = 'Joran'
+
 from django.conf.urls.defaults import patterns,include
 #admin.autodiscover()
 from django.utils.html import escape
-from views import index,search,upload_image,view,add_comment
+from views import google_oauth,fb_oauth,login_or_profile
 
 urlpatterns = patterns('',
     # Example:
-     #(r'^jBlog/', include('jBlog.foo.urls')),
+    #(r'^jBlog/', include('jBlog.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
-    (r'^$',index,{}),
-    (r'^search.php$',search),
-    (r'^upload.php$',upload_image),
-    (r'comments/add/(?P<article_id>.*)$',add_comment),
-    (r'^view/(?P<article_id>.+)/?$',view),
+    (r'^login/?$',login_or_profile),
+    (r'^login/google/?$',google_oauth),
+    (r'^login/fb/?$',fb_oauth),
 
-    #(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     #(r'^admin/docz/', settings.MEDIA_ROOT),
     # Uncomment the next line to enable the admin:
     #(r'^admin/', include(admin.site.urls)),
@@ -23,3 +22,4 @@ urlpatterns = patterns('',
     #    }),
     #(r'^(?P<path>.*)$',include('jBlog.blog.urls')),
 )
+

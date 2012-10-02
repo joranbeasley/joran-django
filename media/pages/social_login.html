@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <script type="text/javascript" src="/media/js/jquery.min.js"></script>
+<script type="text/javascript">
+   oauth_url = "https://accounts.google.com/o/oauth2/auth";
+   d='response_type=code&'+
+      'client_id=867409884723-66j3vvh7drng6s2un9g8f9u67tap7ut8.apps.googleusercontent.com&'+
+      'redirect_uri=http://127.0.0.1:8000/oath_callback&'+
+      'scope=https://www.googleapis.com/auth/userinfo.profile';
+   my_url=oauth_url+'?'+d;
+
+</script>
+    </head>
+    <body>
+
+<a href="#" id="open_oauth">Login With Google</a>
+    </body>
+</html>
+<script>
+    $("#open_oauth").click(function(e){
+        window.open(my_url)
+    })
+</script>

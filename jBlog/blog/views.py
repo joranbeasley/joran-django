@@ -1,9 +1,11 @@
-from django.shortcuts import render_to_response,HttpResponse
-import re
+from django.shortcuts import render_to_response,HttpResponse,redirect
+from django.core.context_processors import csrf
+from django.utils.html import escape
+import re,time,urllib,urllib2
 from django.db.models import Q
-
-
-from models import Entry,Tag
+import json
+from django.template import RequestContext
+from models import Entry,Tag,Comment
 def index(request,path=''):
     return render_to_response('blog/list.html', 
                               {'entries':
@@ -57,7 +59,20 @@ def upload_image(requesst,path=''):
     return HttpResponse("Complete")
 
 def view(request,article_id=-1):
+
     try:article = Entry.objects.get(pk=article_id)
     except ValueError:
         article = Entry.objects.get(title=article_id.replace("_"," "))
-    return render_to_response('blog/view.html',{'entry':article,'title':article.title})
+    ctx = {'entry':article,'title':article.title}
+    ctx.update(csrf(request))
+    return render_to_response('blog/view.html',ctx,context_instance=RequestContext(request))
+def add_comment(request,article_id):
+    try:
+        article = Entry.objects.get(pk=article_id)
+    except:
+        return HttpResponse("Article Not Found!")
+    #c = Comment(author=)
+    p = article_id
+    c=Comment(post = article,body =request.POST['body'],author=request.POST['author'],timestamp=time.strftime("%Y-%m-%d %H:%M"))
+    c.save()
+    return redirect("/view/%s"%p)

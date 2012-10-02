@@ -1,0 +1,31 @@
+<div style="width:320px;display:none"><strong>OR Login With</strong><br>
+    Logged In as:<img src="{{ request.session.user_info.picture }}" width="50px" height="50px"/> {{ request.session.user_info.name }}
+    <a  class="zocial googleplus small" href="/oauth/login/google?next={{ request.path }}">Google</a>
+    <a  class="zocial facebook small" href="/oauth/login/google?next={{ request.path }}">Facebook</a>
+
+    <form action="comments/add/{{ entry.id }}" method="POST">
+        <div width="400px" style="float:right">
+            <script type="text/javascript"
+                    src="http://www.google.com/recaptcha/api/challenge?k=6Leoh9YSAAAAAMjk0JddvYXEhmp46uGg6O2Kt0WW">
+            </script>
+            <noscript>
+                <iframe src="http://www.google.com/recaptcha/api/noscript?k=your_public_key"
+                        height="300" width="500" frameborder="0"></iframe><br>
+                <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+                </textarea>
+                <input type="hidden" name="recaptcha_response_field"
+                       value="manual_challenge">
+            </noscript>
+        </div>
+        <textarea name="body" rows="5" cols="70"></textarea><br>
+        <table><tr><td>
+
+            <table>
+                <tr><td>Your Name</td><td>: <input type="text" name="author" /></td></tr>
+                <tr><td>Email</td><td>: <input type="text" name="email" /></td></tr>
+            </table>
+            <input type="submit" value="add comment!"/>
+            {% csrf_token %}
+    </form>
+
+</div>

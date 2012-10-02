@@ -4,7 +4,7 @@ from django.conf import settings
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 
-
+from jBlog.jauth.views import oauth_response as oauth_callback
 
 admin.autodiscover()
 
@@ -14,7 +14,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     # (r'^jBlog/', include('jBlog.foo.urls')),
-
+    (r'^oauth/',include('jBlog.jauth.urls')),
+    (r'^oath_callback',oauth_callback),
     # Uncomment the admin/doc line below to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/docz/', settings.MEDIA_ROOT),
