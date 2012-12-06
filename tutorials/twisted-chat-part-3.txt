@@ -1,0 +1,56 @@
+Twisted Chat:Its Alive!!!
+=========================
+Part 3/3
+
+link:twisted-chat-part-2[Back to Part 2]
+
+In this 3rd and final step of our tutorial we will create our twisted client and bind it to our gui.
+
+[source,python]
+-----------------------------------
+#!/usr/bin/python
+# twisted_client.py
+# created by: Joran Beasley
+
+from wx.lib.pubsub import Publisher # to facilitate communication with the gui
+from twisted.spread import pb
+from twisted.internet import  wxreactor
+wxreactor.install()
+from twisted.internet import reactor
+
+class ClientCommunicator(pb.Referenceable):
+    def __init__(self,username):
+        self.username = username
+        self.factory = pb.PBClientFactory()
+        Publisher.subscribe(self.OnBroadcast,"SEND_MESSAGE")
+    def run(self):
+        reactor.connectTCP("localhost", 8800, self.factory)
+        def1 = self.factory.getRootObject()
+        def1.addCallback(self.GotRoot)
+        def1.addErrback(self.connection_error)
+        reactor.run()
+	def connection_error(self,e):
+        print "Got Error"
+        wx.MessageBox("Error: Unable to connect!")
+	def GotRoot(self,obj):
+        self.ref = obj
+        self.register()
+    def register(self):
+        self.ref.callRemote("register", self,self.username)
+		
+if __name__ == "__main__":
+    import wx
+	from gui import ChatFrame
+	
+	app = wx.App(redirect = False)
+	reactor.registerWxApp(app) #tell twisted to use the wxEventLoop with the app
+	f = ChatFrame()
+	u = ClientCommunicator(wx.GetTextFromUser("Enter Username"))
+	u.run()
+-----------------------------------
+
++++
+<script>
+var disqus_identifier = "/tutorials/twisted-chat-part-1"
+</script>
++++

@@ -1,0 +1,100 @@
+Twisted Chat
+------------
+Part 1/3
+
+This Tutorial Series Requires:
+	Python 2.6, 
+	wxPython, 
+	Twisted (python)
+
+In this tutorial we will discuss how to create a chatserver using twisted and and how to interface with it through wx.  We will be using the twisted perspective broker to introduce remote calls between clients and servers.  This will lead into our second tutorial in which we introduce "chatrooms", which will lead to our final tutorial of this series on creating a multiplayer chess game.
+
+The first thing we will need for our chat is the server.  The server is responsible for sending/recieving data from clients and basically allows remote interaction. 
+
+
+[source,python]
+-----------------------------------------------------
+#! /usr/bin/python
+#  server.py
+#  created by: Joran Beasley
+
+from twisted.spread import pb
+from twisted.internet import reactor
+
+
+class ServerCommunicator(pb.Root):
+	users = {} #just a dictionary to hold our users
+	
+	#
+	# We are going to add several methods here to make this a more interesting server
+	#
+	
+	def remote_print(self,msg):  #a client could call this as   >>> connection.callRemote("print","hello world")
+	    print "Some Client Told me to 'print':",msg
+
+reactor.listenTCP(8800, pb.PBServerFactory(ServerCommunicator()))
+print "RUNNING..."
+reactor.run()	
+----------------------------------------------------
+
+Now as it stands, this would work fine as a server... It would not really do anything, and so would quickly become pretty boring.  but it introduces us a little bit to the concept of a client remotely calling the server.
+Next we should add a remote method to register a user and to handle user disconnects as well as a way to notify clients of new users.
+
+[source,python]
+-----------------------------------------------------
+class ServerCommunicator(pb.Root):
+	users = {} #just a dictionary to hold our users
+	
+	def remote_register(self,user_name,deffered_connection_object):# client calls : connection.callRemote("register",self.username,self)
+		if user_name in self.users: #if this username is already in use
+			deffered_connection_object.callRemote("username_taken") #inform the user connection object that they cant use that name
+			return False
+		self.users[user_name] = deffered_connection_object # add our client to our user list
+		deffered_connection_object.notifyOnDisconnect(self.OnClientDisconnect) #bind a listener for disconnecting
+		self.TellAll("users_updated",self.users.keys()) #let the clients know about updated user list
+		return True
+		
+	def OnClientDisconnect(self,client):
+		users,connections = self.users.keys(),self.users.values()
+		#find and remove the disconnecting user
+		self.users.pop(connections.index(client))
+		self.TellAll("users_updated",self.users.keys()) #let the clients know about updated user list
+	
+	def TellAll(self,remote_method,*args):
+		for connection in self.users.values(): #send a remote call to all users
+			connection.callRemote(remote_method,*args) 
+	#
+	# We are going to add several methods here to make this a more interesting server
+	#
+	
+----------------------------------------------------
+
+Ok now our server can have users connect and keeps track of their connection objects, slightly more interesting.  This step introduces binding the notifyOnDisconnect listener, as well as sending a callRemote to a client object.
+Next we should probably add a method that broadcasts a message to all clients , as well as one that handles whispers.
+
+[source,python]
+----------------------------------------------------
+class ServerCommunicator(pb.Root):
+	users = {} #just a dictionary to hold our users
+	def remote_register(self,user_name,deffered_connection_object): ...
+	def OnClientDisconnect(self,client):...
+	def TellAll(self,remote_method,*args):...
+	
+	def remote_broadcast(self,from_user,msg): #send a message to all users
+		self.TellAll("broadcast",from_user,msg)
+			
+	def remote_whisper(self,from_user,to_user,msg): #send a message to one user
+		self.users[to_user].call_remote("whisper",from_user,msg)
+----------------------------------------------------
+Thats it our server is finished! ... now we can move onto the client.
+
+All Source is available on github : link:github.com[Github Repository]
++++
+<script>
+var disqus_identifier = "/tutorials/twisted-chat-part-1"
+</script>
++++
+
+[big]#link:twisted-chat-part-2[Continue On To Part 2: The Client Interface]#
+
+

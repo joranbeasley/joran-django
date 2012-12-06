@@ -1,0 +1,174 @@
+Twisted Chat:The Interface
+==========================
+Part 2/3
+
+link:twisted-chat-part-1[Back to Part 1]
+
+Now it is time for us to create our graphical front end to our chat server that we created in part 1.  We will implement this as an event driven gui in wxPython.  We will be hand coding the entire interface, however if you feel comfortable doing so feel free to use a GUI builder, I just prefer to hand code my interfaces as I feel there is more fine grained control. Part 3 of this tutorial will cover the twisted client and wiring everything together.
+
+First we want to subclass wx.Frame to create our application window
+[source,python]
+-------------------------------------
+#!/usr/bin/python
+#  gui.py
+# created by: Joran Beasley
+import wx
+
+class ChatFrame(wx.Frame):
+	def __init__(self):
+		#call our super constructor to create the frame
+		super(ChatFrame,self).__init__(None,-1,"Twisted Chat")
+	
+	#
+	# We will add some more methods to make this class more interesting
+	#
+	
+if __name__ == "__main__":
+	app = wx.App(redirect=False)
+	my_frame = ChatFrame()
+	my_frame.Show()
+	app.MainLoop()
+-------------------------------------
+If we run this program we should see a frame appear with the name "Twisted Chat" , not very exciting... but like everything, "any great journey begins with a single step." But lets make it a little more interesting by adding a panel that will contain all of our gui elements.
+[source,python]
+-------------------------------------
+import wx
+
+class ChatPanel(wx.Panel):
+	def __init__(self,parent):
+		super(ChatPanel).__init__(parent,-1)
+	
+class ChatFrame(wx.Frame):
+	def __init__(self):
+		#call our super constructor to create the frame
+		super(ChatFrame,self).__init__(None,-1,"Twisted Chat")	
+		self.panel = ChatPanel(self)
+		
+	#
+	# We will add some more methods to make this class more interesting
+	#
+	
+if __name__ == "__main__": ...
+-------------------------------------
+now when we run this program you will notice the background is a different shade of grey not much of a difference yet, so lets add some elements to our new panel.
+[source,python]
+-------------------------------------
+import wx
+from wx.html import HtmlWindow
+
+class ChatPanel(wx.Panel):
+	def __init__(self,parent):
+		super(ChatPanel).__init__(parent,-1)
+		self.widgets = {}
+		self.AddWidgets()
+	def AddWidgets(self):
+		self.widgets = {
+			"chat_panel":wx.HtmlWindow(self,-1,size=(500,300)),  #a panel to display our chat messages
+			"chat_users":wx.HtmlWindow(self,-1,size=(200,300)),  #a panel to display user names
+			"chat_bar":wx.TextCtrl(self,-1,size=(500,-1)),       # a text entry input to allow typing a message
+			"chat_btn":wx.Button(self,-1,"Send Message",size=(200,-1)) # sends the current message
+		}
+
+class ChatFrame(wx.Frame): ...
+if __name__ == "__main__": ...
+-------------------------------------
+now when you run the program it should have a bunch of elements... too bad they are just a scrambled mess right now ... dont worry we will fix that next.
+[source,python]
+-------------------------------------
+import ...
+
+class ChatPanel(wx.Panel):
+	def __init__(self,parent):
+		super(ChatPanel).__init__(parent,-1)
+		self.widgets = {}
+		self.AddWidgets()
+		self.LayoutWidgets() #layout our widgets
+		self.Layout()        #call our actual layout (which actually does the layout)
+		self.Fit()           #fit to our content
+	def AddWidgets(self): 
+		...
+		
+	def LayoutWidgets(self):
+		sz = wx.FlexGridSizer(2,2) #flexible grid sizer 2 rows and 2 columns
+		for widget in "chat_panel,chat_users,chat_bar,chat_btn".split(","):
+			sz.Add(self.widgets[widget],0,wx.ALL,10) # add with a border of 10
+		self.SetSizer(sz)
+		
+class ChatFrame(wx.Frame):
+	def __init__(self):
+		#call our super constructor to create the frame
+		super(ChatFrame,self).__init__(None,-1,"Twisted Chat")	
+		self.panel = ChatPanel(self)
+		sz = wx.BoxSizer()
+		sz.Add(self.panel)
+		self.SetSizer(sz)
+		self.Layout()
+		self.Fit() #make sure we size our frame to the size of the content
+		
+if __name__ == "__main__": ...
+-------------------------------------
+now when you run it it should be starting to look like an interface ... but somewhat anticlimatically nothing happens at all.  so now lets wire up some actions and data to our panel. we will create our functions to send a new message and to recieve a message from the server.  We will also create functions to populate our chat box and our users list.
+[source,python]
+-------------------------------------
+import wx
+from wx.html import HtmlWindow
+from wx.lib.pubsub import Publisher
+
+class ChatPanel(wx.Panel):
+	def __init__(self,parent):
+		super(ChatPanel).__init__(parent,-1)
+		self.widgets = {}
+		self.AddWidgets()
+		self.LayoutWidgets() 
+		self.Layout()        
+		self.Fit()
+		self.username = "" #we must know our own name
+		self.users = []
+		self.messages = []
+		#Standard Binding
+		self.widgets["chat_btn"].Bind(wx.EVT_BUTTON,self.OnSendMessage)
+		#pubsub event bindings
+		Publisher.subscribe(self.OnMessageRecieved,"MESSAGE_RECIEVED")
+		Publisher.subscribe(self.OnUpdateUsers,"UPDATE_USERS")
+	def OnSendMessage(self,evt): #this is triggered via the wx Event framework
+		msg = self.widgets["chat_bar"].GetValue()
+		self.widgets["chat_bar"].SetValue("")#clear Input
+		self.widgets["chat_bar"].Focus() #put keyboard focus back in bar
+		if msg == "":return False #nothing to send
+		#send our even through the pubsub framework provided by wx
+		Publisher.sendMessage("MESSAGE_SENT",self.username,msg)
+	def OnMessageRecieved(self,evt): #this will be triggered by a pubsub event
+		self.NewMessage(evt.data)
+	def OnUpdateUsers(self,evt): #this will be triggered by a pubsub event
+		self.users = evt.data
+		self.UpdateUsers()
+		
+	#the functions below just help update our application state	
+	def NewMessage(self,msg):
+		self.messages.append(msg)
+		self.UpdateChatMessages()
+		
+	def UpdateChatMessages(self):
+		messages = []
+		for msg in self.messages:
+			if msg[0] == self.username:
+				messages.append("<font color=\"blue\">You say</font>,<em>%s</em>"%msg[1]) #this is a message of yours
+			else: 
+				messages.append("<font color=\"green\">%s says<font>,<em>%s</em>"%tuple(msg)) #this message is from someone else
+		widgets["chat_panel"].SetPage("<br>".join(messages))
+	def UpdateUsers(self):
+		users = ["<font color=\"green\"><strong>%s</strong></font>"%u if u != self.username else "<font color=\"blue\"><strong>%s</strong></font>"%u for u in self.users]
+		widget["chat_users"].SetPage("<br>".join(users))
+	
+	def AddWidgets(self): 
+		...
+		
+	def LayoutWidgets(self):
+		...
+		
+class ChatFrame(wx.Frame): ...
+if __name__ == "__main__": ...
+-------------------------------------
+And now we have our entire interface defined. as always all source can be found at github link:github.com[Github Repository]
+
+[big]#link:twisted-chat-part-3[Continue On To Part 3: Its Alive!!!]#

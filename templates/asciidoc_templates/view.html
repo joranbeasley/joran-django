@@ -6,20 +6,15 @@
     <link href='http://fonts.googleapis.com/css?family=Pompiere' rel='stylesheet' type='text/css'>
 {% endblock %}
 {% block content %}
-<a href="/">Blog</a><strong> &gt; </strong><a href="/category/{{ entry.category.url }}"> {{ entry.category.title }}</a> <strong> &gt; <i>{{ entry.title }}</i> </strong>
-<hr>
-<div><a href="/view/{{ entry.url }}">{{ entry.title }}</a></div>
-<div>{{ entry.body|safe }}</div>
-    <!-- Place this tag where you want the +1 button to render. -->
-    <div class="g-plusone" data-annotation="inline" data-width="300"></div>
-<a href="#comments_form" onclick="$('#comments_form').show()" >Add Comment</a>
 
-    {% include 'blog/comment_form.html' %}
+    {{  entry|safe }}
+
+
     {#%  if request.session.user_info %#}
 
     {#%  else %#}
     {#% endif %#}
-
+    {% include 'blog/comment_form.html' %}
 
 {% endblock %}
 

@@ -1,23 +1,33 @@
+* {
+    margin: 0;
+}
+html, body {
+    height: 100%;
+
+}
+
 #main_content
 {
     width:900px;
     display:block;
     margin-left:auto;
     margin-right:auto;
+    text-align: left;
+    padding-bottom: 45px;
 }
-#footer_wrap
-{
-    display:block;
-    width:100%;
-    position:absolute;
-    bottom:0px;
-    text-align:center;
+.wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+
+
+    margin: 0 auto -42px; /* the bottom margin is the negative value of the footer's height */
 }
-#footer
-{
-    width:900px;
+.footer, .push {
+    height: 42px; /* .push must be the same height as .footer */
+    width: 900px;
     display:block;
-    text-align:left;
     margin-left:auto;
     margin-right:auto;
+    border-top: medium solid #d3d3d3;
 }

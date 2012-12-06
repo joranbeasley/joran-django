@@ -14,7 +14,9 @@
     <script type="text/javascript" src="/media/google-code-prettify/distrib/google-code-prettify/prettify.js"></script>
     <script type="text/javascript" src="/media/js/jquery.min.js"></script>
     <!--<script type="text/javascript" src="/media/js/jquery.init.js"></script>-->
-
+    {%  for css_file in css_files %}
+        <link rel="stylesheet" type="text/css" href="{{ css_file }}" />
+    {% endfor %}
 {% block extra_header %}
 
 {% endblock %}
@@ -52,6 +54,7 @@
     </script>
 </head>
 <body onload="LoadComplete();">
+<div class="wrap">
 {% block site_header %}
     <div style="display:block;background-image:url(/media/python_header1.gif);background-repeat:no-repeat;width:100%;height:200px;background-position:center;margin:0px;padding:0px;"></div>
 {% endblock %}
@@ -63,8 +66,10 @@
     No Content Your template should override
 {% endblock %}
 </div>
+<div style="clear:both"></div>
+</div>
 {% block site_footer %}
-    <div id="footer_wrap"><div id="footer">(c) Joran Beasley 2012<span style="float:right">Powered by Django</span></div></div>
+    <div class="footer">(c) Joran Beasley 2012<span style="float:right">Powered by Django</span></div>
 {% endblock %}
 </body>
 </html>

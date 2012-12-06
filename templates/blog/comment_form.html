@@ -9,24 +9,20 @@
 <!-- script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script!-->
 
 
-<div id="comment_form_div">
-    <form action="comments/add/{{ entry.id }}" method="POST">
-
-    {% if request.session.udata %}
-        Logged In
-    {% else %}
-        Not Logged In
-    {% endif %}
-    </form>
-</div>
 <div id="disqus_thread"></div>
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
     var disqus_shortname = 'adventuresinpy'; // required: replace example with your forum shortname
+    {%  if disqus_identifier %}
 
+    var disqus_identifier = "{{ disqus_identifier }}"
+
+    {% endif %}
     /* * * DON'T EDIT BELOW THIS LINE * * */
     (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     })();

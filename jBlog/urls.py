@@ -24,5 +24,6 @@ urlpatterns = patterns('',
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
             'document_root': 'C:/Users/Joran/Documents/joran-django/media/',
         }),
+    (r'^asciidoc/',include('jBlog.AsciiDoc.urls')),
     (r'',include('jBlog.blog.urls')),
 )
