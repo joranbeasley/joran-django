@@ -4,7 +4,7 @@ from django.utils.html import escape
 import re,time,urllib,urllib2
 from django.db.models import Q
 import json
-from django.template import RequestContext
+#from django.template import RequestContext
 from models import Entry,Tag,Comment
 def index(request,path=''):
     return render_to_response('blog/list.html', 
@@ -65,7 +65,7 @@ def view(request,article_id=-1):
         article = Entry.objects.get(title=article_id.replace("_"," "))
     ctx = {'entry':article,'title':article.title}
     ctx.update(csrf(request))
-    return render_to_response('blog/view.html',ctx,context_instance=RequestContext(request))
+    return render_to_response('blog/view.html',ctx)#,context_instance=RequestContext(request))
 def add_comment(request,article_id):
     try:
         article = Entry.objects.get(pk=article_id)
