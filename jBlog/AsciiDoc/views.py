@@ -1,6 +1,6 @@
 # Create your views here.
 from django.http import  HttpResponse, HttpResponseForbidden
-from django.shortcuts import  render_to_response,RequestContext
+from django.shortcuts import  render_to_response#,RequestContext
 from jBlog import  settings
 import os
 def index(ref,folder,file_base):
@@ -20,4 +20,4 @@ def index(ref,folder,file_base):
         os.system("asciidoc.py --out-file=\"%s\" --no-header-footer \"%s\""%(html_path,src_doc))
 
     ctx={"entry":open(html_path).read(),"css_files":["/media/css/asciidoc.css"]}
-    return render_to_response('asciidoc_templates/view.html',ctx,context_instance=RequestContext(ref))
+    return render_to_response('asciidoc_templates/view.html',ctx)#,context_instance=RequestContext(ref))
