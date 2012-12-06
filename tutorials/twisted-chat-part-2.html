@@ -1,0 +1,169 @@
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p><a href="twisted-chat-part-1">Back to Part 1</a></p></div>
+<div class="paragraph"><p>Now it is time for us to create our graphical front end to our chat server that we created in part 1.  We will implement this as an event driven gui in wxPython.  We will be hand coding the entire interface, however if you feel comfortable doing so feel free to use a GUI builder, I just prefer to hand code my interfaces as I feel there is more fine grained control. Part 3 of this tutorial will cover the twisted client and wiring everything together.</p></div>
+<div class="paragraph"><p>First we want to subclass wx.Frame to create our application window</p></div>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span class="c">#!/usr/bin/python</span>
+<span class="c">#  gui.py</span>
+<span class="c"># created by: Joran Beasley</span>
+<span class="kn">import</span> <span class="nn">wx</span>
+
+<span class="k">class</span> <span class="nc">ChatFrame</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="c">#call our super constructor to create the frame</span>
+                <span class="nb">super</span><span class="p">(</span><span class="n">ChatFrame</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s">&quot;Twisted Chat&quot;</span><span class="p">)</span>
+
+        <span class="c">#</span>
+        <span class="c"># We will add some more methods to make this class more interesting</span>
+        <span class="c">#</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">App</span><span class="p">(</span><span class="n">redirect</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">my_frame</span> <span class="o">=</span> <span class="n">ChatFrame</span><span class="p">()</span>
+        <span class="n">my_frame</span><span class="o">.</span><span class="n">Show</span><span class="p">()</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">MainLoop</span><span class="p">()</span>
+</pre></div></div></div>
+<div class="paragraph"><p>If we run this program we should see a frame appear with the name "Twisted Chat" , not very exciting&#8230; but like everything, "any great journey begins with a single step." But lets make it a little more interesting by adding a panel that will contain all of our gui elements.</p></div>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wx</span>
+
+<span class="k">class</span> <span class="nc">ChatPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">):</span>
+                <span class="nb">super</span><span class="p">(</span><span class="n">ChatPanel</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ChatFrame</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="c">#call our super constructor to create the frame</span>
+                <span class="nb">super</span><span class="p">(</span><span class="n">ChatFrame</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s">&quot;Twisted Chat&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">panel</span> <span class="o">=</span> <span class="n">ChatPanel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c">#</span>
+        <span class="c"># We will add some more methods to make this class more interesting</span>
+        <span class="c">#</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="o">...</span>
+</pre></div></div></div>
+<div class="paragraph"><p>now when we run this program you will notice the background is a different shade of grey not much of a difference yet, so lets add some elements to our new panel.</p></div>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wx</span>
+<span class="kn">from</span> <span class="nn">wx.html</span> <span class="kn">import</span> <span class="n">HtmlWindow</span>
+
+<span class="k">class</span> <span class="nc">ChatPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">):</span>
+                <span class="nb">super</span><span class="p">(</span><span class="n">ChatPanel</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widgets</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">AddWidgets</span><span class="p">()</span>
+        <span class="k">def</span> <span class="nf">AddWidgets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widgets</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s">&quot;chat_panel&quot;</span><span class="p">:</span><span class="n">wx</span><span class="o">.</span><span class="n">HtmlWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span><span class="mi">300</span><span class="p">)),</span>  <span class="c">#a panel to display our chat messages</span>
+                        <span class="s">&quot;chat_users&quot;</span><span class="p">:</span><span class="n">wx</span><span class="o">.</span><span class="n">HtmlWindow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="mi">300</span><span class="p">)),</span>  <span class="c">#a panel to display user names</span>
+                        <span class="s">&quot;chat_bar&quot;</span><span class="p">:</span><span class="n">wx</span><span class="o">.</span><span class="n">TextCtrl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">500</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span>       <span class="c"># a text entry input to allow typing a message</span>
+                        <span class="s">&quot;chat_btn&quot;</span><span class="p">:</span><span class="n">wx</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s">&quot;Send Message&quot;</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="c"># sends the current message</span>
+                <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">ChatFrame</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span> <span class="o">...</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="o">...</span>
+</pre></div></div></div>
+<div class="paragraph"><p>now when you run the program it should have a bunch of elements&#8230; too bad they are just a scrambled mess right now &#8230; dont worry we will fix that next.</p></div>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span class="kn">import</span> <span class="o">...</span>
+
+<span class="k">class</span> <span class="nc">ChatPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">):</span>
+                <span class="nb">super</span><span class="p">(</span><span class="n">ChatPanel</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widgets</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">AddWidgets</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LayoutWidgets</span><span class="p">()</span> <span class="c">#layout our widgets</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Layout</span><span class="p">()</span>        <span class="c">#call our actual layout (which actually does the layout)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Fit</span><span class="p">()</span>           <span class="c">#fit to our content</span>
+        <span class="k">def</span> <span class="nf">AddWidgets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="o">...</span>
+
+        <span class="k">def</span> <span class="nf">LayoutWidgets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">sz</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">FlexGridSizer</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="c">#flexible grid sizer 2 rows and 2 columns</span>
+                <span class="k">for</span> <span class="n">widget</span> <span class="ow">in</span> <span class="s">&quot;chat_panel,chat_users,chat_bar,chat_btn&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;,&quot;</span><span class="p">):</span>
+                        <span class="n">sz</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="n">widget</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="n">wx</span><span class="o">.</span><span class="n">ALL</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span> <span class="c"># add with a border of 10</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="n">sz</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">ChatFrame</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="c">#call our super constructor to create the frame</span>
+                <span class="nb">super</span><span class="p">(</span><span class="n">ChatFrame</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s">&quot;Twisted Chat&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">panel</span> <span class="o">=</span> <span class="n">ChatPanel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">sz</span> <span class="o">=</span> <span class="n">wx</span><span class="o">.</span><span class="n">BoxSizer</span><span class="p">()</span>
+                <span class="n">sz</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">SetSizer</span><span class="p">(</span><span class="n">sz</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Layout</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Fit</span><span class="p">()</span> <span class="c">#make sure we size our frame to the size of the content</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="o">...</span>
+</pre></div></div></div>
+<div class="paragraph"><p>now when you run it it should be starting to look like an interface &#8230; but somewhat anticlimatically nothing happens at all.  so now lets wire up some actions and data to our panel. we will create our functions to send a new message and to recieve a message from the server.  We will also create functions to populate our chat box and our users list.</p></div>
+<div class="listingblock">
+<div class="content"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">wx</span>
+<span class="kn">from</span> <span class="nn">wx.html</span> <span class="kn">import</span> <span class="n">HtmlWindow</span>
+<span class="kn">from</span> <span class="nn">wx.lib.pubsub</span> <span class="kn">import</span> <span class="n">Publisher</span>
+
+<span class="k">class</span> <span class="nc">ChatPanel</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Panel</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">parent</span><span class="p">):</span>
+                <span class="nb">super</span><span class="p">(</span><span class="n">ChatPanel</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widgets</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">AddWidgets</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LayoutWidgets</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Layout</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Fit</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="c">#we must know our own name</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="c">#Standard Binding</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="s">&quot;chat_btn&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">Bind</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">EVT_BUTTON</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">OnSendMessage</span><span class="p">)</span>
+                <span class="c">#pubsub event bindings</span>
+                <span class="n">Publisher</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OnMessageRecieved</span><span class="p">,</span><span class="s">&quot;MESSAGE_RECIEVED&quot;</span><span class="p">)</span>
+                <span class="n">Publisher</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OnUpdateUsers</span><span class="p">,</span><span class="s">&quot;UPDATE_USERS&quot;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">OnSendMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">evt</span><span class="p">):</span> <span class="c">#this is triggered via the wx Event framework</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="s">&quot;chat_bar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">GetValue</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="s">&quot;chat_bar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span><span class="c">#clear Input</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widgets</span><span class="p">[</span><span class="s">&quot;chat_bar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">Focus</span><span class="p">()</span> <span class="c">#put keyboard focus back in bar</span>
+                <span class="k">if</span> <span class="n">msg</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span><span class="k">return</span> <span class="bp">False</span> <span class="c">#nothing to send</span>
+                <span class="c">#send our even through the pubsub framework provided by wx</span>
+                <span class="n">Publisher</span><span class="o">.</span><span class="n">sendMessage</span><span class="p">(</span><span class="s">&quot;MESSAGE_SENT&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">OnMessageRecieved</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">evt</span><span class="p">):</span> <span class="c">#this will be triggered by a pubsub event</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">NewMessage</span><span class="p">(</span><span class="n">evt</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">OnUpdateUsers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">evt</span><span class="p">):</span> <span class="c">#this will be triggered by a pubsub event</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="n">evt</span><span class="o">.</span><span class="n">data</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">UpdateUsers</span><span class="p">()</span>
+
+        <span class="c">#the functions below just help update our application state</span>
+        <span class="k">def</span> <span class="nf">NewMessage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">msg</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">UpdateChatMessages</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">UpdateChatMessages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">messages</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">messages</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">:</span>
+                                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;font color=</span><span class="se">\&quot;</span><span class="s">blue</span><span class="se">\&quot;</span><span class="s">&gt;You say&lt;/font&gt;,&lt;em&gt;</span><span class="si">%s</span><span class="s">&lt;/em&gt;&quot;</span><span class="o">%</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c">#this is a message of yours</span>
+                        <span class="k">else</span><span class="p">:</span>
+                                <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;&lt;font color=</span><span class="se">\&quot;</span><span class="s">green</span><span class="se">\&quot;</span><span class="s">&gt;</span><span class="si">%s</span><span class="s"> says&lt;font&gt;,&lt;em&gt;</span><span class="si">%s</span><span class="s">&lt;/em&gt;&quot;</span><span class="o">%</span><span class="nb">tuple</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span> <span class="c">#this message is from someone else</span>
+                <span class="n">widgets</span><span class="p">[</span><span class="s">&quot;chat_panel&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">SetPage</span><span class="p">(</span><span class="s">&quot;&lt;br&gt;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">messages</span><span class="p">))</span>
+        <span class="k">def</span> <span class="nf">UpdateUsers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="n">users</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&lt;font color=</span><span class="se">\&quot;</span><span class="s">green</span><span class="se">\&quot;</span><span class="s">&gt;&lt;strong&gt;</span><span class="si">%s</span><span class="s">&lt;/strong&gt;&lt;/font&gt;&quot;</span><span class="o">%</span><span class="n">u</span> <span class="k">if</span> <span class="n">u</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="k">else</span> <span class="s">&quot;&lt;font color=</span><span class="se">\&quot;</span><span class="s">blue</span><span class="se">\&quot;</span><span class="s">&gt;&lt;strong&gt;</span><span class="si">%s</span><span class="s">&lt;/strong&gt;&lt;/font&gt;&quot;</span><span class="o">%</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">]</span>
+                <span class="n">widget</span><span class="p">[</span><span class="s">&quot;chat_users&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">SetPage</span><span class="p">(</span><span class="s">&quot;&lt;br&gt;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">users</span><span class="p">))</span>
+
+        <span class="k">def</span> <span class="nf">AddWidgets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="o">...</span>
+
+        <span class="k">def</span> <span class="nf">LayoutWidgets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="o">...</span>
+
+<span class="k">class</span> <span class="nc">ChatFrame</span><span class="p">(</span><span class="n">wx</span><span class="o">.</span><span class="n">Frame</span><span class="p">):</span> <span class="o">...</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="o">...</span>
+</pre></div></div></div>
+<div class="paragraph"><p>And now we have our entire interface defined. as always all source can be found at github <a href="github.com">Github Repository</a></p></div>
+<div class="paragraph"><p><span class="big"><a href="twisted-chat-part-3">Continue On To Part 3: Its Alive!!!</a></span></p></div>
+<div class="paragraph"><p><script>
+var disqus_identifier = "/tutorials/twisted-chat-part-1"
+</script></p></div>
+</div>
+</div>
